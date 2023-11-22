@@ -1,28 +1,81 @@
-// // Copyright (c) 2020 Computer Vision Center (CVC) at the Universitat Autonoma\n// de Barcelona (UAB).\n//\n// Copyright (c) 2023 Synkrotron.ai\n//\n// This work is licensed under the terms of the MIT license.\n// For a copy, see <https://opensource.org/licenses/MIT>.
+// Copyright (c) 2020 Computer Vision Center (CVC) at the Universitat Autonoma
+// de Barcelona (UAB).
+//
+// This work is licensed under the terms of the MIT license.
+// For a copy, see <https://opensource.org/licenses/MIT>.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
+#include "Components/BoxComponent.h"
+#include "OpenDrive/OpenDrive.h"
+#include <utility>
 #include "SignComponent.generated.h"
 
+namespace carla
+{
+	namespace road
+	{
+		class Map;
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+		namespace element
+		{
+			class RoadInfoSignal;
+		}
+	}
+}
+
+namespace cr = carla::road;
+namespace cre = carla::road::element;
+
+/// Class representing an OpenDRIVE Signal
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class CARLA_API USignComponent : public USceneComponent
 {
 	GENERATED_BODY()
 
-public:	
-	// Sets default values for this component's properties
+public:
 	USignComponent();
+
+	UFUNCTION(Category = "Traffic Sign", BlueprintPure)
+	const FString& GetSignId() const;
+
+	UFUNCTION(Category = "Traffic Sign", BlueprintCallable)
+	void SetSignId(const FString& Id);
+
+	// Initialize sign (e.g. generate trigger boxes)
+	virtual void InitializeSign(const cr::Map& Map);
+
+	void AddEffectTriggerVolume(UBoxComponent* TriggerVolume);
+
+	const TArray<UBoxComponent*> GetEffectTriggerVolume() const;
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
 	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
+	                           FActorComponentTickFunction* ThisTickFunction) override;
 
-		
+	TArray<std::pair<cr::RoadId, const cre::RoadInfoSignal*>>
+	GetAllReferencesToThisSignal(const cr::Map& Map);
+
+	const cr::Signal* GetSignal(const cr::Map& Map) const;
+
+	/// Generates a trigger box component in the parent actor
+	/// BoxSize should be in Unreal units
+	UBoxComponent* GenerateTriggerBox(const FTransform& BoxTransform,
+	                                  float BoxSize);
+
+	UBoxComponent* GenerateTriggerBox(const FTransform& BoxTransform,
+	                                  const FVector& BoxSize);
+
+private:
+	UPROPERTY(Category = "Traffic Sign", EditAnywhere)
+	FString SignId = "";
+
+	UPROPERTY()
+	TArray<UBoxComponent*> EffectTriggerVolumes;
 };

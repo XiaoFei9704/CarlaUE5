@@ -1,27 +1,65 @@
-// // Copyright (c) 2020 Computer Vision Center (CVC) at the Universitat Autonoma\n// de Barcelona (UAB).\n//\n// Copyright (c) 2023 Synkrotron.ai\n//\n// This work is licensed under the terms of the MIT license.\n// For a copy, see <https://opensource.org/licenses/MIT>.
+// Copyright (c) 2017 Computer Vision Center (CVC) at the Universitat Autonoma
+// de Barcelona (UAB).
+//
+// This work is licensed under the terms of the MIT license.
+// For a copy, see <https://opensource.org/licenses/MIT>.
 
 
 #include "MapGen/StaticMeshCollection.h"
+#include "Carla.h"
+#include "Components/InstancedStaticMeshComponent.h"
+#include "Engine/StaticMesh.h"
 
-// Sets default values
-AStaticMeshCollection::AStaticMeshCollection()
+AStaticMeshCollection::AStaticMeshCollection(
+	const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer)
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
+	PrimaryActorTick.bCanEverTick = false;
+	RootComponent =
+		ObjectInitializer.CreateDefaultSubobject<USceneComponent>(this, TEXT("SceneComponent"));
+	RootComponent->SetMobility(EComponentMobility::Static);
 }
 
-// Called when the game starts or when spawned
-void AStaticMeshCollection::BeginPlay()
+void AStaticMeshCollection::PushBackInstantiator(UStaticMesh* Mesh)
 {
-	Super::BeginPlay();
-	
+	auto Instantiator = NewObject<UInstancedStaticMeshComponent>(this);
+	check(Instantiator != nullptr);
+	Instantiator->SetMobility(EComponentMobility::Static);
+	Instantiator->SetupAttachment(RootComponent);
+	Instantiator->SetStaticMesh(Mesh);
+	Instantiator->RegisterComponent();
+	MeshInstantiators.Add(Instantiator);
 }
 
-// Called every frame
-void AStaticMeshCollection::Tick(float DeltaTime)
+void AStaticMeshCollection::SetStaticMesh(uint32 i, UStaticMesh* Mesh)
 {
-	Super::Tick(DeltaTime);
-
+	if ((GetNumberOfInstantiators() > i) && (MeshInstantiators[i] != nullptr))
+	{
+		MeshInstantiators[i]->SetStaticMesh(Mesh);
+	}
 }
 
+void AStaticMeshCollection::AddInstance(uint32 i, const FTransform& Transform)
+{
+	if ((GetNumberOfInstantiators() > i) && (MeshInstantiators[i] != nullptr))
+	{
+		MeshInstantiators[i]->AddInstance(Transform);
+	}
+}
+
+void AStaticMeshCollection::ClearInstances()
+{
+	for (auto* Instantiator : MeshInstantiators)
+	{
+		if (Instantiator != nullptr)
+		{
+			Instantiator->ClearInstances();
+		}
+	}
+}
+
+void AStaticMeshCollection::ClearInstantiators()
+{
+	ClearInstances();
+	MeshInstantiators.Empty();
+}

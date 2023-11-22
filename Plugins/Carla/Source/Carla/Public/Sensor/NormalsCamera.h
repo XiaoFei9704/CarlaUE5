@@ -1,17 +1,27 @@
-// // Copyright (c) 2020 Computer Vision Center (CVC) at the Universitat Autonoma\n// de Barcelona (UAB).\n//\n// Copyright (c) 2023 Synkrotron.ai\n//\n// This work is licensed under the terms of the MIT license.\n// For a copy, see <https://opensource.org/licenses/MIT>.
+// Copyright (c) 2022 Computer Vision Center (CVC) at the Universitat Autonoma
+// de Barcelona (UAB).
+//
+// This work is licensed under the terms of the MIT license.
+// For a copy, see <https://opensource.org/licenses/MIT>.
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Sensor/ShaderBasedSensor.h"
+#include "Actor/ActorDefinition.h"
+
 #include "NormalsCamera.generated.h"
 
-/**
- * 
- */
+/// Sensor that produces "normals" images.
 UCLASS()
 class CARLA_API ANormalsCamera : public AShaderBasedSensor
 {
 	GENERATED_BODY()
-	
+
+public:
+	static FActorDefinition GetSensorDefinition();
+
+	ANormalsCamera(const FObjectInitializer& ObjectInitializer);
+
+protected:
+	void PostPhysTick(UWorld* World, ELevelTick TickType, float DeltaSeconds) override;
 };

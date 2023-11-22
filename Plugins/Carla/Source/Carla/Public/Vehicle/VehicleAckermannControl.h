@@ -1,15 +1,30 @@
-// // Copyright (c) 2020 Computer Vision Center (CVC) at the Universitat Autonoma\n// de Barcelona (UAB).\n//\n// Copyright (c) 2023 Synkrotron.ai\n//\n// This work is licensed under the terms of the MIT license.\n// For a copy, see <https://opensource.org/licenses/MIT>.
+// Copyright (c) 2021 Computer Vision Center (CVC) at the Universitat Autonoma
+// de Barcelona (UAB).
+//
+// This work is licensed under the terms of the MIT license.
+// For a copy, see <https://opensource.org/licenses/MIT>.
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "VehicleAckermannControl.generated.h"
 
-/**
- * 
- */
-class CARLA_API VehicleAckermannControl
+USTRUCT(BlueprintType)
+struct CARLA_API FVehicleAckermannControl
 {
-public:
-	VehicleAckermannControl();
-	~VehicleAckermannControl();
+	GENERATED_BODY()
+
+	UPROPERTY(Category = "Vehicle Ackermann Control", EditAnywhere, BlueprintReadWrite)
+	float Steer = 0.0f;
+
+	UPROPERTY(Category = "Vehicle Ackermann Control", EditAnywhere, BlueprintReadWrite)
+	float SteerSpeed = 0.0f;
+
+	UPROPERTY(Category = "Vehicle Ackermann Control", EditAnywhere, BlueprintReadWrite)
+	float Speed = 0.0f;
+
+	UPROPERTY(Category = "Vehicle Ackermann Control", EditAnywhere, BlueprintReadWrite)
+	float Acceleration = 0.0f;
+
+	UPROPERTY(Category = "Vehicle Ackermann Control", EditAnywhere, BlueprintReadWrite)
+	float Jerk = 0.0f;
 };

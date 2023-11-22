@@ -1,12 +1,26 @@
-// // Copyright (c) 2020 Computer Vision Center (CVC) at the Universitat Autonoma\n// de Barcelona (UAB).\n//\n// Copyright (c) 2023 Synkrotron.ai\n//\n// This work is licensed under the terms of the MIT license.\n// For a copy, see <https://opensource.org/licenses/MIT>.
-
+// Copyright (c) 2022 Computer Vision Center (CVC) at the Universitat Autonoma
+// de Barcelona (UAB).
+//
+// This work is licensed under the terms of the MIT license.
+// For a copy, see <https://opensource.org/licenses/MIT>.
 
 #include "Sensor/SensorManager.h"
+#include "Sensor/Sensor.h"
 
-SensorManager::SensorManager()
+void FSensorManager::RegisterSensor(ASensor* Sensor)
 {
+	SensorList.Emplace(Sensor);
 }
 
-SensorManager::~SensorManager()
+void FSensorManager::DeRegisterSensor(ASensor* Sensor)
 {
+	SensorList.Remove(Sensor);
+}
+
+void FSensorManager::PostPhysTick(UWorld* World, ELevelTick TickType, float DeltaSeconds)
+{
+	for (ASensor* Sensor : SensorList)
+	{
+		Sensor->PostPhysTickInternal(World, TickType, DeltaSeconds);
+	}
 }

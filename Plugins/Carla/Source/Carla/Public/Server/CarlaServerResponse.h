@@ -1,15 +1,27 @@
-// // Copyright (c) 2020 Computer Vision Center (CVC) at the Universitat Autonoma\n// de Barcelona (UAB).\n//\n// Copyright (c) 2023 Synkrotron.ai\n//\n// This work is licensed under the terms of the MIT license.\n// For a copy, see <https://opensource.org/licenses/MIT>.
+// Copyright (c) 2020 Computer Vision Center (CVC) at the Universitat Autonoma
+// de Barcelona (UAB).
+//
+// This work is licensed under the terms of the MIT license.
+// For a copy, see <https://opensource.org/licenses/MIT>.
 
 #pragma once
 
-#include "CoreMinimal.h"
-
-/**
- * 
- */
-class CARLA_API CarlaServerResponse
+enum class ECarlaServerResponse
 {
-public:
-	CarlaServerResponse();
-	~CarlaServerResponse();
+	Success,
+	ActorNotFound,
+	ActorTypeMismatch,
+	FunctionNotSupported,
+	NullActor,
+	MissingActor,
+	NotAVehicle,
+	WalkerDead,
+	NotAWalker,
+	WalkerIncompatibleController,
+	AutoPilotNotSupported,
+	CarSimPluginNotEnabled,
+	NotATrafficLight,
+	FunctionNotAvailiableWhenDormant
 };
+
+static FString GetStringError(ECarlaServerResponse Response);

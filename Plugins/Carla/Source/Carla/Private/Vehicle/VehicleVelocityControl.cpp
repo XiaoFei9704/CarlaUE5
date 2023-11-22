@@ -1,34 +1,55 @@
-// // Copyright (c) 2020 Computer Vision Center (CVC) at the Universitat Autonoma\n// de Barcelona (UAB).\n//\n// Copyright (c) 2023 Synkrotron.ai\n//\n// This work is licensed under the terms of the MIT license.\n// For a copy, see <https://opensource.org/licenses/MIT>.
-
+// Copyright (c) 2020 Computer Vision Center (CVC) at the Universitat Autonoma
+// de Barcelona (UAB).
+//
+// This work is licensed under the terms of the MIT license.
+// For a copy, see <https://opensource.org/licenses/MIT>.
 
 #include "Vehicle/VehicleVelocityControl.h"
+#include "Kismet/KismetMathLibrary.h"
 
-// Sets default values for this component's properties
 UVehicleVelocityControl::UVehicleVelocityControl()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
 }
 
-
-// Called when the game starts
 void UVehicleVelocityControl::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	
+	SetComponentTickEnabled(false);
+	SetTickGroup(ETickingGroup::TG_PrePhysics);
+
+	OwnerVehicle = GetOwner();
+	PrimitiveComponent = Cast<UPrimitiveComponent>(OwnerVehicle->GetRootComponent());
 }
 
-
-// Called every frame
-void UVehicleVelocityControl::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UVehicleVelocityControl::Activate(bool bReset)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	Super::Activate(bReset);
 
-	// ...
+	TargetVelocity = FVector();
+	SetComponentTickEnabled(true);
 }
 
+void UVehicleVelocityControl::Activate(FVector Velocity, bool bReset)
+{
+	Super::Activate(bReset);
+
+	TargetVelocity = Velocity;
+	SetComponentTickEnabled(true);
+}
+
+void UVehicleVelocityControl::Deactivate()
+{
+	SetComponentTickEnabled(false);
+	Super::Deactivate();
+}
+
+void UVehicleVelocityControl::TickComponent(float DeltaTime, enum ELevelTick TickType,
+                                            FActorComponentTickFunction* ThisTickFunction)
+{
+	TRACE_CPUPROFILER_EVENT_SCOPE(UVehicleVelocityControl::TickComponent);
+	FTransform Transf = OwnerVehicle->GetActorTransform();
+	const FVector LocVel = Transf.TransformVector(TargetVelocity);
+	PrimitiveComponent->SetPhysicsLinearVelocity(LocVel, false, "None");
+}

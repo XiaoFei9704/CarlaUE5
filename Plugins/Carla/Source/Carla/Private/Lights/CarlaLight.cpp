@@ -1,34 +1,75 @@
-// // Copyright (c) 2020 Computer Vision Center (CVC) at the Universitat Autonoma\n// de Barcelona (UAB).\n//\n// Copyright (c) 2023 Synkrotron.ai\n//\n// This work is licensed under the terms of the MIT license.\n// For a copy, see <https://opensource.org/licenses/MIT>.
+// Copyright (c) 2020 Computer Vision Center (CVC) at the Universitat Autonoma
+// de Barcelona (UAB).
+//
+// This work is licensed under the terms of the MIT license.
+// For a copy, see <https://opensource.org/licenses/MIT>.
 
+#pragma once
 
 #include "Lights/CarlaLight.h"
 
-// Sets default values for this component's properties
-UCarlaLight::UCarlaLight()
+#include <vector>
+
+#include <compiler/disable-ue4-macros.h>
+#include <carla/rpc/LightState.h>
+#include <compiler/enable-ue4-macros.h>
+#include "CoreMinimal.h"
+#include "Subsystems/WorldSubsystem.h"
+
+#include "CarlaLightSubsystem.generated.h"
+
+/**
+ *
+ */
+UCLASS(Blueprintable, BlueprintType)
+class CARLA_API UCarlaLightSubsystem : public UWorldSubsystem
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	GENERATED_BODY()
 
-	// ...
-}
+	//using cr = carla::rpc;
 
+public:
+	// Begin USubsystem
+	void Initialize(FSubsystemCollectionBase& Collection) override;
+	// End USubsystem
+	void Deinitialize() override;
 
-// Called when the game starts
-void UCarlaLight::BeginPlay()
-{
-	Super::BeginPlay();
+	void RegisterLight(UCarlaLight* CarlaLight);
 
-	// ...
-	
-}
+	void UnregisterLight(UCarlaLight* CarlaLight);
 
+	UFUNCTION(BlueprintCallable)
+	bool IsUpdatePending() const;
 
-// Called every frame
-void UCarlaLight::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	UFUNCTION(BlueprintCallable)
+	int32 NumLights() const
+	{
+		return Lights.Num();
+	}
 
-	// ...
-}
+	std::vector<carla::rpc::LightState> GetLights(FString Client);
 
+	void SetLights(
+		FString Client,
+		std::vector<carla::rpc::LightState> LightsToSet,
+		bool DiscardClient = false);
+
+	UCarlaLight* GetLight(int Id);
+
+	TMap<int, UCarlaLight*>& GetLights()
+	{
+		return Lights;
+	}
+
+	void SetDayNightCycle(const bool active);
+
+private:
+	void SetClientStatesdirty(FString ClientThatUpdate);
+
+	TMap<int, UCarlaLight*> Lights;
+
+	// Flag for each client to tell if an update needs to be done
+	TMap<FString, bool> ClientStates;
+	// Since the clients doesn't have a proper id on the simulation,
+	// I use the host : port pair.
+};

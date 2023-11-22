@@ -29,7 +29,14 @@ public class Carla : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core", "CoreUObject", "ChaosVehicles"
+				"Core",
+				"RenderCore",
+				"RHI",
+				"Renderer",
+				"CoreUObject",
+				"ChaosVehicles",
+				"ProceduralMeshComponent",
+				"Eigen"
 				// ... add other public dependencies that you statically link with here ...
 			}
 		);
@@ -42,6 +49,14 @@ public class Carla : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
+				"ImageWriteQueue",
+				"Foliage",
+				"AIModule",
+				"AssetRegistry",
+				"Json",
+				"JsonUtilities",
+				"Landscape",
+				"PhysicsCore"
 				// ... add private dependencies that you statically link with here ...	
 			}
 		);

@@ -1,27 +1,35 @@
-// // Copyright (c) 2020 Computer Vision Center (CVC) at the Universitat Autonoma\n// de Barcelona (UAB).\n//\n// Copyright (c) 2023 Synkrotron.ai\n//\n// This work is licensed under the terms of the MIT license.\n// For a copy, see <https://opensource.org/licenses/MIT>.
-
+// Copyright (c) 2017 Computer Vision Center (CVC) at the Universitat Autonoma
+// de Barcelona (UAB).
+//
+// This work is licensed under the terms of the MIT license.
+// For a copy, see <https://opensource.org/licenses/MIT>.
 
 #include "Traffic/TrafficSignBase.h"
+#include "Traffic/SignComponent.h"
 
-// Sets default values
-ATrafficSignBase::ATrafficSignBase()
+ATrafficSignBase::ATrafficSignBase(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
+	RootComponent =
+		ObjectInitializer.CreateDefaultSubobject<USceneComponent>(this, TEXT("SceneRootComponent"));
+	RootComponent->SetMobility(EComponentMobility::Static);
 }
 
-// Called when the game starts or when spawned
-void ATrafficSignBase::BeginPlay()
+TArray<UBoxComponent*> ATrafficSignBase::GetTriggerVolumes() const
 {
-	Super::BeginPlay();
-	
+	TArray<USignComponent*> Components;
+	GetComponents<USignComponent>(Components, false);
+	if (Components.Num())
+	{
+		USignComponent* SignComponent = Components[0];
+		return SignComponent->GetEffectTriggerVolume();
+	}
+	else
+	{
+		TArray<UBoxComponent*> TriggerVolumes;
+		TriggerVolumes.Add(GetTriggerVolume());
+		return TriggerVolumes;
+	}
 }
-
-// Called every frame
-void ATrafficSignBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-

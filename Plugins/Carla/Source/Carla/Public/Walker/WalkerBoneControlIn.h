@@ -1,15 +1,18 @@
-// // Copyright (c) 2020 Computer Vision Center (CVC) at the Universitat Autonoma\n// de Barcelona (UAB).\n//\n// Copyright (c) 2023 Synkrotron.ai\n//\n// This work is licensed under the terms of the MIT license.\n// For a copy, see <https://opensource.org/licenses/MIT>.
+// Copyright (c) 2017 Computer Vision Center (CVC) at the Universitat Autonoma
+// de Barcelona (UAB).
+//
+// This work is licensed under the terms of the MIT license.
+// For a copy, see <https://opensource.org/licenses/MIT>.
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "WalkerBoneControlIn.generated.h"
 
-/**
- * 
- */
-class CARLA_API WalkerBoneControlIn
+USTRUCT(BlueprintType)
+struct CARLA_API FWalkerBoneControlIn
 {
-public:
-	WalkerBoneControlIn();
-	~WalkerBoneControlIn();
+	GENERATED_BODY()
+
+	UPROPERTY(Category = "Walker Bone Control", EditAnywhere, BlueprintReadWrite)
+	TMap<FString, FTransform> BoneTransforms;
 };

@@ -1,27 +1,16 @@
-// // Copyright (c) 2020 Computer Vision Center (CVC) at the Universitat Autonoma\n// de Barcelona (UAB).\n//\n// Copyright (c) 2023 Synkrotron.ai\n//\n// This work is licensed under the terms of the MIT license.\n// For a copy, see <https://opensource.org/licenses/MIT>.
+// Copyright (c) 2017 Computer Vision Center (CVC) at the Universitat Autonoma de Barcelona (UAB).
+// This work is licensed under the terms of the MIT license.
+// For a copy, see <https://opensource.org/licenses/MIT>.
 
 
 #include "MapGen/UncenteredPivotPointMesh.h"
 
-// Sets default values
-AUncenteredPivotPointMesh::AUncenteredPivotPointMesh()
+AUncenteredPivotPointMesh::AUncenteredPivotPointMesh(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("SceneRoot"));
+	SMComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComp"));
+	SMComp->SetupAttachment(RootComponent);
 }
-
-// Called when the game starts or when spawned
-void AUncenteredPivotPointMesh::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-// Called every frame
-void AUncenteredPivotPointMesh::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-

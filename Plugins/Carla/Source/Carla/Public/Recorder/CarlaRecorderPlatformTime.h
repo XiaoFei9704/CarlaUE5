@@ -1,15 +1,27 @@
-// // Copyright (c) 2020 Computer Vision Center (CVC) at the Universitat Autonoma\n// de Barcelona (UAB).\n//\n// Copyright (c) 2023 Synkrotron.ai\n//\n// This work is licensed under the terms of the MIT license.\n// For a copy, see <https://opensource.org/licenses/MIT>.
+// Copyright (c) 2020 Computer Vision Center (CVC) at the Universitat Autonoma
+// de Barcelona (UAB).
+//
+// This work is licensed under the terms of the MIT license.
+// For a copy, see <https://opensource.org/licenses/MIT>.
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include <sstream>
+#include <chrono>
 
-/**
- * 
- */
-class CARLA_API CarlaRecorderPlatformTime
+#pragma pack(push, 1)
+struct CarlaRecorderPlatformTime
 {
-public:
-	CarlaRecorderPlatformTime();
-	~CarlaRecorderPlatformTime();
+	std::chrono::time_point<std::chrono::system_clock>
+	RecorderStartTime;
+
+	double Time;
+
+	void SetStartTime();
+	void UpdateTime();
+
+	void Read(std::istream& InFile);
+
+	void Write(std::ostream& OutFile);
 };
+#pragma pack(pop)

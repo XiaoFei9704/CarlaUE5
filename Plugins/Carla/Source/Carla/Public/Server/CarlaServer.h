@@ -1,15 +1,53 @@
-// // Copyright (c) 2020 Computer Vision Center (CVC) at the Universitat Autonoma\n// de Barcelona (UAB).\n//\n// Copyright (c) 2023 Synkrotron.ai\n//\n// This work is licensed under the terms of the MIT license.\n// For a copy, see <https://opensource.org/licenses/MIT>.
+// Copyright (c) 2017 Computer Vision Center (CVC) at the Universitat Autonoma
+// de Barcelona (UAB).
+//
+// This work is licensed under the terms of the MIT license.
+// For a copy, see <https://opensource.org/licenses/MIT>.
 
 #pragma once
 
+#include "Actor/CarlaActor.h"
+#include "Sensor/DataStreamImpl.h"
+
 #include "CoreMinimal.h"
 
-/**
- * 
- */
-class CARLA_API CarlaServer
+#include <compiler/disable-ue4-macros.h>
+#include <carla/multigpu/router.h>
+#include <carla/streaming/Server.h>
+#include <compiler/enable-ue4-macros.h>
+
+class UCarlaEpisode;
+
+class FCarlaServer
 {
 public:
-	CarlaServer();
-	~CarlaServer();
+	FCarlaServer();
+
+	~FCarlaServer();
+
+	FDataMultiStream Start(uint16_t RPCPort, uint16_t StreamingPort, uint16_t SecondaryPort);
+
+	void NotifyBeginEpisode(UCarlaEpisode& Episode);
+
+	void NotifyEndEpisode();
+
+	void AsyncRun(uint32 NumberOfWorkerThreads);
+
+	void RunSome(uint32 Milliseconds);
+
+	void Tick();
+
+	bool TickCueReceived();
+
+	void Stop();
+
+	FDataStream OpenStream() const;
+
+	std::shared_ptr<carla::multigpu::Router> GetSecondaryServer();
+
+	carla::streaming::Server& GetStreamingServer();
+
+private:
+	class FPimpl;
+	TUniquePtr<FPimpl> Pimpl;
 };

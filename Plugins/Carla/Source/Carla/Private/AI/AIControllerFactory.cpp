@@ -1,5 +1,43 @@
-// // Copyright (c) 2020 Computer Vision Center (CVC) at the Universitat Autonoma\n// de Barcelona (UAB).\n//\n// Copyright (c) 2023 Synkrotron.ai\n//\n// This work is licensed under the terms of the MIT license.\n// For a copy, see <https://opensource.org/licenses/MIT>.
-
+// Copyright (c) 2019 Computer Vision Center (CVC) at the Universitat Autonoma
+// de Barcelona (UAB).
+//
+// This work is licensed under the terms of the MIT license.
+// For a copy, see <https://opensource.org/licenses/MIT>.
 
 #include "AI/AIControllerFactory.h"
 
+#include "AI/WalkerAIController.h"
+#include "Actor/ActorBlueprintFunctionLibrary.h"
+
+TArray<FActorDefinition> AAIControllerFactory::GetDefinitions()
+{
+	using ABFL = UActorBlueprintFunctionLibrary;
+	auto WalkerController = ABFL::MakeGenericDefinition(
+		TEXT("controller"),
+		TEXT("ai"),
+		TEXT("walker"));
+	WalkerController.Class = AWalkerAIController::StaticClass();
+	return {WalkerController};
+}
+
+FActorSpawnResult AAIControllerFactory::SpawnActor(
+	const FTransform& Transform,
+	const FActorDescription& Description)
+{
+	auto* World = GetWorld();
+	if (World == nullptr)
+	{
+		UE_LOG(LogCarla, Error, TEXT("AAIControllerFactory: cannot spawn controller into an empty world."));
+		return {};
+	}
+
+	FActorSpawnParameters SpawnParameters;
+	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	auto* Controller = World->SpawnActor<AActor>(Description.Class, Transform, SpawnParameters);
+
+	if (Controller == nullptr)
+	{
+		UE_LOG(LogCarla, Error, TEXT("AAIControllerFactory: spawn controller failed."));
+	}
+	return FActorSpawnResult{Controller};
+}

@@ -1,26 +1,136 @@
-// // Copyright (c) 2020 Computer Vision Center (CVC) at the Universitat Autonoma\n// de Barcelona (UAB).\n//\n// Copyright (c) 2023 Synkrotron.ai\n//\n// This work is licensed under the terms of the MIT license.\n// For a copy, see <https://opensource.org/licenses/MIT>.
+// Copyright (c) 2017 Computer Vision Center (CVC) at the Universitat Autonoma
+// de Barcelona (UAB).
+//
+// This work is licensed under the terms of the MIT license.
+// For a copy, see <https://opensource.org/licenses/MIT>.
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Game/CarlaEpisode.h"
+#include "Sensor/DataStreamImpl.h"
+#include "Util/RandomEngine.h"
+
 #include "GameFramework/Actor.h"
+
 #include "Sensor.generated.h"
 
-UCLASS()
+struct FActorDescription;
+
+/// Base class for sensors.
+UCLASS(Abstract, hidecategories = (Collision, Attachment, Actor))
 class CARLA_API ASensor : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
-	ASensor();
+
+public:
+	ASensor(const FObjectInitializer& ObjectInitializer);
+
+	void SetEpisode(const UCarlaEpisode& InEpisode)
+	{
+		Episode = &InEpisode;
+	}
+
+	virtual void Set(const FActorDescription& Description);
+
+	virtual void BeginPlay();
+
+	/// Replace the FDataStream associated with this sensor.
+	///
+	/// @warning Do not change the stream after BeginPlay. It is not thread-safe.
+	void SetDataStream(FDataStream InStream)
+	{
+		Stream = std::move(InStream);
+	}
+
+	FDataStream MoveDataStream()
+	{
+		return std::move(Stream);
+	}
+
+	/// Return the token that allows subscribing to this sensor's stream.
+	auto GetToken() const
+	{
+		return Stream.GetToken();
+	}
+
+	void Tick(const float DeltaTime) final;
+
+	virtual void PrePhysTick(float DeltaSeconds)
+	{
+	}
+
+	virtual void PostPhysTick(UWorld* World, ELevelTick TickType, float DeltaSeconds)
+	{
+	}
+
+	// Small interface to notify sensors when clients are listening
+	virtual void OnFirstClientConnected()
+	{
+	};
+	// Small interface to notify sensors when no clients are listening
+	virtual void OnLastClientDisconnected()
+	{
+	};
+
+
+	void PostPhysTickInternal(UWorld* World, ELevelTick TickType, float DeltaSeconds);
+
+	UFUNCTION(BlueprintCallable)
+	URandomEngine* GetRandomEngine()
+	{
+		return RandomEngine;
+	}
+
+	UFUNCTION(BlueprintCallable)
+	int32 GetSeed() const
+	{
+		return Seed;
+	}
+
+	UFUNCTION(BlueprintCallable)
+	void SetSeed(int32 InSeed);
+
+	const UCarlaEpisode& GetEpisode() const
+	{
+		check(Episode != nullptr);
+		return *Episode;
+	}
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	void PostActorCreated() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
+	/// Return the FDataStream associated with this sensor.
+	///
+	/// You need to provide a reference to self, this is necessary for template
+	/// deduction.
+	template <typename SensorT>
+	FAsyncDataStream GetDataStream(const SensorT& Self)
+	{
+		return Stream.MakeAsyncDataStream(Self, GetEpisode().GetElapsedGameTime());
+	}
+
+	/// Seed of the pseudo-random engine.
+	UPROPERTY(Category = "Random Engine", EditAnywhere)
+	int32 Seed = 123456789;
+
+	/// Random Engine used to provide noise for sensor output.
+	UPROPERTY()
+	URandomEngine* RandomEngine = nullptr;
+
+	UPROPERTY()
+	bool bIsActive = false;
+
+private:
+	FDataStream Stream;
+
+	FDelegateHandle OnPostTickDelegate;
+
+	const UCarlaEpisode* Episode = nullptr;
+
+	/// Allows the sensor to tick with the tick rate from UE4.
+	bool ReadyToTick = false;
+
+	bool bClientsListening = false;
 };

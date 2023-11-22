@@ -1,15 +1,35 @@
-// // Copyright (c) 2020 Computer Vision Center (CVC) at the Universitat Autonoma\n// de Barcelona (UAB).\n//\n// Copyright (c) 2023 Synkrotron.ai\n//\n// This work is licensed under the terms of the MIT license.\n// For a copy, see <https://opensource.org/licenses/MIT>.
+// Copyright (c) 2020 Computer Vision Center (CVC) at the Universitat Autonoma
+// de Barcelona (UAB).
+//
+// This work is licensed under the terms of the MIT license.
+// For a copy, see <https://opensource.org/licenses/MIT>.
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "ProceduralCustomMesh.generated.h"
 
-/**
- * 
- */
-class CARLA_API ProceduralCustomMesh
+/// A definition of a Carla Mesh.
+USTRUCT()
+struct CARLA_API FProceduralCustomMesh
 {
-public:
-	ProceduralCustomMesh();
-	~ProceduralCustomMesh();
+	GENERATED_BODY()
+
+	UPROPERTY()
+	TArray<FVector> Vertices;
+
+	UPROPERTY()
+	TArray<int32> Triangles;
+
+	UPROPERTY()
+	TArray<FVector> Normals;
+
+	UPROPERTY()
+	TArray<FVector2D> UV0;
+
+	UPROPERTY()
+	TArray<FLinearColor> VertexColor;
+
+	// This is commented due to an strange bug including ProceduralMeshComponent.h
+	// UPROPERTY()
+	// TArray<FProcMeshTangent> Tangents;
 };

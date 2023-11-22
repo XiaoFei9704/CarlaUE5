@@ -1,15 +1,20 @@
-// // Copyright (c) 2020 Computer Vision Center (CVC) at the Universitat Autonoma\n// de Barcelona (UAB).\n//\n// Copyright (c) 2023 Synkrotron.ai\n//\n// This work is licensed under the terms of the MIT license.\n// For a copy, see <https://opensource.org/licenses/MIT>.
+// Copyright (c) 2022 Computer Vision Center (CVC) at the Universitat Autonoma
+// de Barcelona (UAB).
+//
+// This work is licensed under the terms of the MIT license.
+// For a copy, see <https://opensource.org/licenses/MIT>.
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include <sstream>
 
-/**
- * 
- */
-class CARLA_API CarlaRecorderFrameCounter
+#pragma pack(push, 1)
+struct CarlaRecorderFrameCounter
 {
-public:
-	CarlaRecorderFrameCounter();
-	~CarlaRecorderFrameCounter();
+	uint64_t FrameCounter;
+
+	void Read(std::istream& InFile);
+
+	void Write(std::ostream& OutFile);
 };
+#pragma pack(pop)

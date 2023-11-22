@@ -1,5 +1,21 @@
-// // Copyright (c) 2020 Computer Vision Center (CVC) at the Universitat Autonoma\n// de Barcelona (UAB).\n//\n// Copyright (c) 2023 Synkrotron.ai\n//\n// This work is licensed under the terms of the MIT license.\n// For a copy, see <https://opensource.org/licenses/MIT>.
-
-
+// Copyright (c) 2017 Computer Vision Center (CVC) at the Universitat Autonoma
+// de Barcelona (UAB).
+//
+// This work is licensed under the terms of the MIT license.
+// For a copy, see <https://opensource.org/licenses/MIT>.
 #include "Game/CarlaGameInstance.h"
 
+#include "Settings/CarlaSettings.h"
+
+UCarlaGameInstance::UCarlaGameInstance()
+{
+	CarlaSettings = CreateDefaultSubobject<UCarlaSettings>(TEXT("CarlaSettings"));
+	Recorder = CreateDefaultSubobject<ACarlaRecorder>(TEXT("Recorder"));
+	CarlaEngine.SetRecorder(Recorder);
+
+	check(CarlaSettings != nullptr);
+	CarlaSettings->LoadSettings();
+	CarlaSettings->LogSettings();
+}
+
+UCarlaGameInstance::~UCarlaGameInstance() = default;

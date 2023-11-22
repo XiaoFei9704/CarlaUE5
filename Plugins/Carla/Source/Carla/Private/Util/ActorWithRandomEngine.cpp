@@ -1,27 +1,46 @@
-// // Copyright (c) 2020 Computer Vision Center (CVC) at the Universitat Autonoma\n// de Barcelona (UAB).\n//\n// Copyright (c) 2023 Synkrotron.ai\n//\n// This work is licensed under the terms of the MIT license.\n// For a copy, see <https://opensource.org/licenses/MIT>.
-
+// Copyright (c) 2017 Computer Vision Center (CVC) at the Universitat Autonoma
+// de Barcelona (UAB).
+//
+// This work is licensed under the terms of the MIT license.
+// For a copy, see <https://opensource.org/licenses/MIT>.
 
 #include "Util/ActorWithRandomEngine.h"
+#include "Util/RandomEngine.h"
+#include "Carla.h"
 
-// Sets default values
-AActorWithRandomEngine::AActorWithRandomEngine()
+AActorWithRandomEngine::AActorWithRandomEngine(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer)
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
+	RandomEngine = CreateDefaultSubobject<URandomEngine>(TEXT("RandomEngine"));
 }
 
-// Called when the game starts or when spawned
-void AActorWithRandomEngine::BeginPlay()
+void AActorWithRandomEngine::OnConstruction(const FTransform& Transform)
 {
-	Super::BeginPlay();
-	
+	Super::OnConstruction(Transform);
+	check(RandomEngine != nullptr);
+	RandomEngine->Seed(Seed);
 }
 
-// Called every frame
-void AActorWithRandomEngine::Tick(float DeltaTime)
+#if WITH_EDITOR
+void AActorWithRandomEngine::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
-	Super::Tick(DeltaTime);
-
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+	if (PropertyChangedEvent.Property)
+	{
+		if (bGenerateRandomSeed)
+		{
+			Seed = URandomEngine::GenerateRandomSeed();
+			bGenerateRandomSeed = false;
+		}
+		check(RandomEngine != nullptr);
+		RandomEngine->Seed(Seed);
+	}
 }
+#endif // WITH_EDITOR
 
+void AActorWithRandomEngine::SetSeed(const int32 InSeed)
+{
+	check(RandomEngine != nullptr);
+	Seed = InSeed;
+	RandomEngine->Seed(InSeed);
+}

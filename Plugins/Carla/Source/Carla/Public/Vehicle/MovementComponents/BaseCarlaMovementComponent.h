@@ -1,17 +1,40 @@
-// // Copyright (c) 2020 Computer Vision Center (CVC) at the Universitat Autonoma\n// de Barcelona (UAB).\n//\n// Copyright (c) 2023 Synkrotron.ai\n//\n// This work is licensed under the terms of the MIT license.\n// For a copy, see <https://opensource.org/licenses/MIT>.
+// Copyright (c) 2021 Computer Vision Center (CVC) at the Universitat Autonoma
+// de Barcelona (UAB).
+// Copyright (c) 2019 Intel Corporation
+//
+// This work is licensed under the terms of the MIT license.
+// For a copy, see <https://opensource.org/licenses/MIT>.
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "GameFramework/MovementComponent.h"
+#include "Vehicle/VehicleControl.h"
 #include "BaseCarlaMovementComponent.generated.h"
 
-/**
- * 
- */
-UCLASS()
+class ACarlaWheeledVehicle;
+
+UCLASS(Blueprintable, meta=(BlueprintSpawnableComponent))
 class CARLA_API UBaseCarlaMovementComponent : public UMovementComponent
 {
 	GENERATED_BODY()
-	
+
+protected:
+	UPROPERTY()
+	ACarlaWheeledVehicle* CarlaVehicle;
+
+public:
+	virtual void BeginPlay() override;
+
+	virtual void ProcessControl(FVehicleControl& Control);
+
+	virtual FVector GetVelocity() const;
+
+	virtual int32 GetVehicleCurrentGear() const;
+
+	virtual float GetVehicleForwardSpeed() const;
+
+protected:
+	void DisableUE4VehiclePhysics();
+
+	void EnableUE4VehiclePhysics(bool bResetVelocity = true);
 };

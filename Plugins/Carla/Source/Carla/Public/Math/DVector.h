@@ -13,23 +13,23 @@ struct FDVector
 	double Y = 0.0;
 	double Z = 0.0;
 
-	FDVector()
+	FDVector() : X(0.0), Y(0.0), Z(0.0)
 	{
 	}
 
-	FDVector(const float InX, const float InY, const float InZ) : X(InX), Y(InY), Z(InZ)
+	FDVector(float InX, float InY, float InZ) : X(InX), Y(InY), Z(InZ)
 	{
 	}
 
-	FDVector(const double InX, const double InY, const double InZ) : X(InX), Y(InY), Z(InZ)
+	FDVector(double InX, double InY, double InZ) : X(InX), Y(InY), Z(InZ)
 	{
 	}
 
-	explicit FDVector(const FVector& V) : X(V.X), Y(V.Y), Z(V.Z)
+	FDVector(const FVector& V) : X(V.X), Y(V.Y), Z(V.Z)
 	{
 	}
 
-	explicit FDVector(const FIntVector& V) : X(V.X), Y(V.Y), Z(V.Z)
+	FDVector(const FIntVector& V) : X(V.X), Y(V.Y), Z(V.Z)
 	{
 	}
 
@@ -45,7 +45,7 @@ struct FDVector
 
 	static double Dist(const FDVector& V1, const FDVector& V2)
 	{
-		return std::sqrt(DistSquared(V1, V2));
+		return std::sqrt(FDVector::DistSquared(V1, V2));
 	}
 
 	static double DistSquared(const FDVector& V1, const FDVector& V2)
@@ -65,7 +65,7 @@ struct FDVector
 
 	FIntVector ToFIntVector() const
 	{
-		return FIntVector(static_cast<int32>(X), static_cast<int32>(Y), static_cast<int32>(Z));
+		return FIntVector((int32)X, (int32)Y, (int32)Z);
 	}
 
 	FDVector& operator=(const FDVector& Other)
@@ -76,7 +76,7 @@ struct FDVector
 		return *this;
 	}
 
-	bool operator==(const FDVector& Other) const
+	bool operator==(const FDVector& Other)
 	{
 		return X == Other.X &&
 			Y == Other.Y &&
@@ -88,7 +88,7 @@ struct FDVector
 		return FDVector(X + V.X, Y + V.Y, Z + V.Z);
 	}
 
-	FDVector& operator+=(const float Scalar)
+	FDVector& operator+=(float Scalar)
 	{
 		this->X += Scalar;
 		this->Y += Scalar;
@@ -114,18 +114,18 @@ struct FDVector
 		return *this;
 	}
 
-	FDVector operator/(const float Scale) const
+	FDVector operator/(float Scale) const
 	{
 		const float RScale = 1.f / Scale;
 		return FDVector(X * RScale, Y * RScale, Z * RScale);
 	}
 
-	FDVector operator*(const float Scale) const
+	FDVector operator*(float Scale) const
 	{
 		return FDVector(X * Scale, Y * Scale, Z * Scale);
 	}
 
-	FDVector operator*=(const float Scale)
+	FDVector operator*=(float Scale)
 	{
 		this->X *= Scale;
 		this->Y *= Scale;
@@ -133,7 +133,7 @@ struct FDVector
 		return *this;
 	}
 
-	FDVector operator*=(const double Scale)
+	FDVector operator*=(double Scale)
 	{
 		this->X *= Scale;
 		this->Y *= Scale;

@@ -1,17 +1,36 @@
-// // Copyright (c) 2020 Computer Vision Center (CVC) at the Universitat Autonoma\n// de Barcelona (UAB).\n//\n// Copyright (c) 2023 Synkrotron.ai\n//\n// This work is licensed under the terms of the MIT license.\n// For a copy, see <https://opensource.org/licenses/MIT>.
+// Copyright (c) 2021 Computer Vision Center (CVC) at the Universitat Autonoma
+// de Barcelona (UAB).
+//
+// This work is licensed under the terms of the MIT license.
+// For a copy, see <https://opensource.org/licenses/MIT>.
 
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Traffic/SignComponent.h"
+#include "SignComponent.h"
 #include "SpeedLimitComponent.generated.h"
 
-/**
- * 
- */
-UCLASS()
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class CARLA_API USpeedLimitComponent : public USignComponent
 {
 	GENERATED_BODY()
-	
+
+public:
+	virtual void InitializeSign(const carla::road::Map& Map) override;
+
+	void SetSpeedLimit(float Limit);
+
+private:
+	void GenerateSpeedBox(const FTransform BoxTransform, float BoxSize);
+
+	UFUNCTION(BlueprintCallable)
+	void OnOverlapBeginSpeedLimitBox(UPrimitiveComponent* OverlappedComp,
+	                                 AActor* OtherActor,
+	                                 UPrimitiveComponent* OtherComp,
+	                                 int32 OtherBodyIndex,
+	                                 bool bFromSweep,
+	                                 const FHitResult& SweepResult);
+
+	UPROPERTY(Category = "Speed Limit", EditAnywhere)
+	float SpeedLimit = 30;
 };

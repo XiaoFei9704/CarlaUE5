@@ -1,15 +1,24 @@
-// // Copyright (c) 2020 Computer Vision Center (CVC) at the Universitat Autonoma\n// de Barcelona (UAB).\n//\n// Copyright (c) 2023 Synkrotron.ai\n//\n// This work is licensed under the terms of the MIT license.\n// For a copy, see <https://opensource.org/licenses/MIT>.
+// Copyright (c) 2017 Computer Vision Center (CVC) at the Universitat Autonoma
+// de Barcelona (UAB).
+//
+// This work is licensed under the terms of the MIT license.
+// For a copy, see <https://opensource.org/licenses/MIT>.
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "WalkerControl.generated.h"
 
-/**
- * 
- */
-class CARLA_API WalkerControl
+USTRUCT(BlueprintType)
+struct CARLA_API FWalkerControl
 {
-public:
-	WalkerControl();
-	~WalkerControl();
+	GENERATED_BODY()
+
+	UPROPERTY(Category = "Walker Control", EditAnywhere, BlueprintReadWrite)
+	FVector Direction = {1.0f, 0.0f, 0.0f};
+
+	UPROPERTY(Category = "Walker Control", EditAnywhere, BlueprintReadWrite)
+	float Speed = 0.0f;
+
+	UPROPERTY(Category = "Walker Control", EditAnywhere, BlueprintReadWrite)
+	bool Jump = false;
 };

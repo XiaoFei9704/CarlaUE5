@@ -1,12 +1,26 @@
-// // Copyright (c) 2020 Computer Vision Center (CVC) at the Universitat Autonoma\n// de Barcelona (UAB).\n//\n// Copyright (c) 2023 Synkrotron.ai\n//\n// This work is licensed under the terms of the MIT license.\n// For a copy, see <https://opensource.org/licenses/MIT>.
-
+// Copyright (c) 2022 Computer Vision Center (CVC) at the Universitat Autonoma
+// de Barcelona (UAB).
+//
+// This work is licensed under the terms of the MIT license.
+// For a copy, see <https://opensource.org/licenses/MIT>.
 
 #include "Recorder/CarlaRecorderFrameCounter.h"
+#include "Recorder/CarlaRecorder.h"
+#include "Recorder/CarlaRecorderHelpers.h"
 
-CarlaRecorderFrameCounter::CarlaRecorderFrameCounter()
+void CarlaRecorderFrameCounter::Read(std::istream& InFile)
 {
+	ReadValue<uint64_t>(InFile, this->FrameCounter);
 }
 
-CarlaRecorderFrameCounter::~CarlaRecorderFrameCounter()
+void CarlaRecorderFrameCounter::Write(std::ostream& OutFile)
 {
+	// write the packet id
+	WriteValue<char>(OutFile, static_cast<char>(CarlaRecorderPacketId::FrameCounter));
+
+	// write packet size
+	uint32_t Total = sizeof(uint64_t);
+	WriteValue<uint32_t>(OutFile, Total);
+
+	WriteValue<uint64_t>(OutFile, this->FrameCounter);
 }

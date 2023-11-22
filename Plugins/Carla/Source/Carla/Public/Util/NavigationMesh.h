@@ -1,15 +1,15 @@
-// // Copyright (c) 2020 Computer Vision Center (CVC) at the Universitat Autonoma\n// de Barcelona (UAB).\n//\n// Copyright (c) 2023 Synkrotron.ai\n//\n// This work is licensed under the terms of the MIT license.\n// For a copy, see <https://opensource.org/licenses/MIT>.
+// Copyright (c) 2019 Computer Vision Center (CVC) at the Universitat Autonoma
+// de Barcelona (UAB).
+//
+// This work is licensed under the terms of the MIT license.
+// For a copy, see <https://opensource.org/licenses/MIT>.
 
 #pragma once
 
-#include "CoreMinimal.h"
-
-/**
- * 
- */
-class CARLA_API NavigationMesh
+class FNavigationMesh
 {
 public:
-	NavigationMesh();
-	~NavigationMesh();
+	/// Return the Navigation Mesh Binary associated to @a MapName, or empty if the such
+	/// file wasn't serialized.
+	static TArray<uint8> Load(FString MapName);
 };
